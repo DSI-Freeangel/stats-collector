@@ -9,6 +9,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
 import org.stats.core.config.Application;
+import org.stats.ui.listeners.OpenEditAccountListener;
 import org.stats.ui.listeners.OpenEditCurrencyListener;
 import org.stats.ui.listeners.OpenEditOrganizationListener;
 
@@ -40,7 +41,7 @@ public class MainMenu extends JMenuBar {
 	    JMenuItem jmiOperationClass = new JMenuItem("Operation Class");
 	    jmiOperationClass.addActionListener(new StubEventListener());
 	    JMenuItem jmiAccount = new JMenuItem("Account");
-	    jmiAccount.addActionListener(new StubEventListener());
+	    jmiAccount.addActionListener(new OpenEditAccountListener(null));
 	    JMenuItem jmiOrganization = new JMenuItem("Organization");
 	    jmiOrganization.addActionListener(new OpenEditOrganizationListener(null));
 	    JMenuItem jmiCurrency = new JMenuItem("Currency");

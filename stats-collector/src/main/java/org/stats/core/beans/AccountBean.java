@@ -3,6 +3,7 @@ package org.stats.core.beans;
 import java.util.Date;
 
 import org.stats.core.entity.Account;
+import org.stats.utils.Constants;
 
 public class AccountBean {
 	
@@ -156,4 +157,11 @@ public class AccountBean {
 		this.enabled = enabled;
 	}
 	
+	public String getStartDateString() {
+		return Constants.DATE_FORMAT.format(this.getStartDate());
+	}
+	
+	public String getEndDateString() {
+		return Constants.DATE_FORMAT.format(this.getEndDate());
+	}
 }
