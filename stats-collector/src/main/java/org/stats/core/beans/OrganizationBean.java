@@ -1,9 +1,10 @@
 package org.stats.core.beans;
 
 import org.stats.core.entity.Organization;
+import org.stats.core.interfaces.IdNameInterface;
 
 
-public class OrganizationBean {
+public class OrganizationBean  implements IdNameInterface {
 	
 	public OrganizationBean() {
 		this(null, null, null);

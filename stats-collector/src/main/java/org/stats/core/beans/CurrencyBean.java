@@ -1,8 +1,9 @@
 package org.stats.core.beans;
 
 import org.stats.core.entity.Currency;
+import org.stats.core.interfaces.IdNameInterface;
 
-public class CurrencyBean {
+public class CurrencyBean implements IdNameInterface {
 
 	public CurrencyBean() {
 		this(null, null, null, null);

@@ -1,7 +1,12 @@
 package org.stats.core.managers;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.stats.core.beans.ActionResult;
 import org.stats.core.beans.CurrencyBean;
@@ -59,5 +64,13 @@ public class CurrencyManager {
 		currency.setIsDefault(currencyBean.getIsDefault());
 		dao.save(currency);
 		return ActionResult.success();
+	}
+
+	public List<CurrencyBean> getAvailableCurrencyList() {
+		List<Currency> availableCurrencyList = dao.getAvailableCurrencyList();
+		if(!CollectionUtils.isEmpty(availableCurrencyList)) {
+			return availableCurrencyList.stream().map(currency -> new CurrencyBean(currency)).collect(Collectors.toList());
+		}
+		return new ArrayList<>();
 	}
 }

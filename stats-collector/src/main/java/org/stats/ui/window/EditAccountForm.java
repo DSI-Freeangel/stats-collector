@@ -18,6 +18,9 @@ import org.springframework.util.StringUtils;
 import org.stats.core.beans.AccountBean;
 import org.stats.core.config.Application;
 import org.stats.core.managers.AccountManager;
+import org.stats.core.managers.CurrencyManager;
+import org.stats.core.managers.OrganizationManager;
+import org.stats.ui.elements.IdNameComboBox;
 import org.stats.ui.listeners.CancelButtonActionListener;
 import org.stats.ui.listeners.ChildWindowCloseListener;
 import org.stats.ui.listeners.SaveAccountActionListener;
@@ -35,6 +38,8 @@ public class EditAccountForm extends JFrame {
 	private JTextField accountEndDateField;
 	private JCheckBox isOwnCheckBox;
 	private JCheckBox isOnHandCheckBox;
+	private IdNameComboBox accountCurrencySelectBox;
+	private IdNameComboBox accountOrganizationSelectBox;
 	
 	private JButton saveButton;
 	private JButton cancelButton;
@@ -59,8 +64,8 @@ public class EditAccountForm extends JFrame {
 				accountEndDateField.setText(account.getEndDateString());
 				isOwnCheckBox.setEnabled(account.getIsOwn());
 				isOnHandCheckBox.setEnabled(account.getIsOnHand());
-				//TODO: Add organization select
-				//TODO: Add currency select
+				accountCurrencySelectBox.setSelectedId(account.getCurrencyId());
+				accountOrganizationSelectBox.setSelectedId(account.getOrganizationId());
 			}
 		}
 	}
@@ -78,21 +83,27 @@ public class EditAccountForm extends JFrame {
 		labelStartDate.setLabelFor(getAccountStartDateField());
 		JLabel labelEndDate = new JLabel("EndDate");
 		labelEndDate.setLabelFor(getAccountEndDateField());
-		panel.setLayout(new GridLayout(6, 2, 5, 5));
+		JLabel labelOrganization = new JLabel("Organization");
+		labelOrganization.setLabelFor(getAccountOrganizationSelectBox());
+		JLabel labelCurrency = new JLabel("Currency");
+		labelCurrency.setLabelFor(getAccountCurrencySelectBox());
+		panel.setLayout(new GridLayout(8, 2, 5, 5));
 		panel.add(labelId);
 		panel.add(getAccountIdField());
 		panel.add(labelCustomId);
 		panel.add(getAccountCustomIdField());
 		panel.add(labelName);
 		panel.add(getAccountNameField());
+		panel.add(labelCurrency);
+		panel.add(getAccountCurrencySelectBox());
+		panel.add(labelOrganization);
+		panel.add(getAccountOrganizationSelectBox());
 		panel.add(labelStartDate);
 		panel.add(getAccountStartDateField());
 		panel.add(labelEndDate);
 		panel.add(getAccountEndDateField());
 		panel.add(getIsOwnCheckBox());
 		panel.add(getIsOnHandCheckBox());
-		//TODO: Add organization select
-		//TODO: Add currency select
 		this.add(panel, BorderLayout.NORTH);
 		this.add(getAccountDescriptionField(), BorderLayout.CENTER);
 		JPanel buttonsPanel = new JPanel();
@@ -180,35 +191,53 @@ public class EditAccountForm extends JFrame {
 		return isOnHandCheckBox;
 	}
 
+	
+	
+	public IdNameComboBox getAccountCurrencySelectBox() {
+		if(null == accountCurrencySelectBox) {
+			CurrencyManager currencyManager = Application.getInstance().getBean(CurrencyManager.class);
+			accountCurrencySelectBox = new IdNameComboBox(currencyManager.getAvailableCurrencyList());
+		}
+		return accountCurrencySelectBox;
+	}
+
+	public IdNameComboBox getAccountOrganizationSelectBox() {
+		if(null == accountOrganizationSelectBox) {
+			OrganizationManager organizationManager = Application.getInstance().getBean(OrganizationManager.class);
+			accountOrganizationSelectBox = new IdNameComboBox(organizationManager.getAvailableOrganizations());
+		}
+		return accountOrganizationSelectBox;
+	}
+
 	public AccountBean getAccountBean() {
-		AccountBean organization = new AccountBean();
+		AccountBean accountBean = new AccountBean();
 		String idString = this.accountIdField.getText();
 		if(!StringUtils.isEmpty(idString)) {
-			organization.setId(Long.valueOf(idString));
+			accountBean.setId(Long.valueOf(idString));
 		}
-		organization.setCustomId(this.accountCustomIdField.getText());
-		organization.setName(this.accountNameField.getText());
-		organization.setDescription(this.accountDescriptionField.getText());
+		accountBean.setCustomId(this.accountCustomIdField.getText());
+		accountBean.setName(this.accountNameField.getText());
+		accountBean.setDescription(this.accountDescriptionField.getText());
 		Date startDate = null;
 		try {
 			startDate = Constants.DATE_FORMAT.parse(this.accountStartDateField.getText());
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
-		organization.setStartDate(startDate);
+		accountBean.setStartDate(startDate);
 		Date endDate = null;
 		try {
 			endDate = Constants.DATE_FORMAT.parse(this.accountEndDateField.getText());
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
-		organization.setEndDate(endDate);
-		organization.setIsOnHand(this.isOnHandCheckBox.isSelected());
-		organization.setIsOwn(this.isOwnCheckBox.isSelected());
-		organization.setEnabled(true);
-		//TODO: Add organization select
-		//TODO: Add currency select
-		return organization;
+		accountBean.setEndDate(endDate);
+		accountBean.setIsOnHand(this.isOnHandCheckBox.isSelected());
+		accountBean.setIsOwn(this.isOwnCheckBox.isSelected());
+		accountBean.setEnabled(true);
+		accountBean.setOrganizationId(this.accountOrganizationSelectBox.getSelectedId());
+		accountBean.setCurrencyId(this.accountCurrencySelectBox.getSelectedId());
+		return accountBean;
 	}
 
 }

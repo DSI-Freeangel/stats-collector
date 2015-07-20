@@ -1,7 +1,12 @@
 package org.stats.core.managers;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.stats.core.beans.ActionResult;
 import org.stats.core.beans.OrganizationBean;
@@ -55,5 +60,13 @@ public class OrganizationManager {
 		organization.setDescription(organizationBean.getDescription());
 		dao.save(organization);
 		return ActionResult.success();
+	}
+
+	public List<OrganizationBean> getAvailableOrganizations() {
+		List<Organization> allOrganizations = dao.getAll();
+		if(!CollectionUtils.isEmpty(allOrganizations)) {
+			return allOrganizations.stream().map(organization -> new OrganizationBean(organization)).collect(Collectors.toList());
+		}
+		return new ArrayList<>();
 	}
 }

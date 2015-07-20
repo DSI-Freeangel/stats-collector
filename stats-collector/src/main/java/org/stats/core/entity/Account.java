@@ -11,7 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-@Entity
+@Entity(name="account")
 public class Account {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
