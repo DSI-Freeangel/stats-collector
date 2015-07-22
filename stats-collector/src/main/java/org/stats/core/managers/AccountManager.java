@@ -4,13 +4,12 @@ import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.stats.core.beans.AccountBean;
-import org.stats.core.beans.ActionResult;
 import org.stats.core.dao.AccountDao;
 import org.stats.core.entity.Account;
 import org.stats.core.entity.Currency;
 import org.stats.core.entity.Organization;
+import org.stats.core.exception.ValidationException;
 
 @Component
 public class AccountManager {
@@ -57,33 +56,18 @@ public class AccountManager {
 		return null;
 	}
 
-	public ActionResult saveAccount(AccountBean accountBean) {
-		if (null == accountBean) {
-			return ActionResult.error("Nothing to save.");
-		}
-		if (StringUtils.isEmpty(accountBean.getName())) {
-			return ActionResult.error("Account name should not be empty.");
-		}
-		if (null == accountBean.getCurrencyId()) {
-			return ActionResult.error("Currency should not be empty.");
-		}
+	public Account saveAccount(AccountBean accountBean) throws ValidationException {
+		ValidationException.assertNotNull(accountBean, "Nothing to save");
+		ValidationException.assertNotEmpty(accountBean.getName(), "Account name should not be empty");
+		ValidationException.assertNotNull(accountBean.getCurrencyId(), "Currency should not be empty");
 		Currency currency = currencyManager.getCurrency(accountBean.getCurrencyId());
-		if(null == currency) {
-			return ActionResult.error("Currency with id #" + accountBean.getCurrencyId() + " not found.");
-		}
-		if (null == accountBean.getOrganizationId()) {
-			return ActionResult.error("Organization should not be empty.");
-		}
+		ValidationException.assertNotNull(currency, "Currency with id #" + accountBean.getCurrencyId() + " not found");
+		ValidationException.assertNotNull(accountBean.getOrganizationId(), "Organization should not be empty");
 		Organization organization = organizationManager.getOrganization(accountBean.getOrganizationId());
-		if(null == organization) {
-			return ActionResult.error("Organization with id #" + accountBean.getOrganizationId() + " not found.");
-		}
+		ValidationException.assertNotNull(null == organization, "Organization with id #" + accountBean.getOrganizationId() + " not found");
 		Account account = null;
 		if (null != accountBean.getId()) {
 			account = dao.get(accountBean.getId());
-			if (null == account) {
-				return ActionResult.error("Account with id #" + accountBean.getId() + " not found.");
-			}
 		} else {
 			account = new Account();
 		}
@@ -99,7 +83,6 @@ public class AccountManager {
 		account.setIsOnHand(Boolean.TRUE.equals(accountBean.getIsOnHand()));
 		account.setIsOwn(Boolean.TRUE.equals(accountBean.getIsOwn()));
 		account.setEnabled(Boolean.TRUE.equals(accountBean.getEnabled()));
-		dao.save(account);
-		return ActionResult.success();
+		return dao.save(account);
 	}
 }

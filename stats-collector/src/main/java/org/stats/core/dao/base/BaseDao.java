@@ -55,19 +55,17 @@ public abstract class BaseDao<T> {
 		return criteria.list();
 	}
 	
-	@SuppressWarnings("unchecked")
 	public T save(T entity) {
-		return (T) getSession().save(entity);
+		getSession().save(entity);
+		return entity;
 	}
 	
-	@SuppressWarnings("unchecked")
-	public List<T> save(Collection<T> entities) {
-		List<T> result = new ArrayList<T>();
+	public Collection<T> save(Collection<T> entities) {
 		Session session = getSession();
 		for(T entity : entities){
-			result.add((T) session.save(entity));
+			session.save(entity);
 		}
-		return result;
+		return entities;
 	}
 	
 	public void delete(T entity) {

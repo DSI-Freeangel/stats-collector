@@ -17,6 +17,7 @@ import javax.swing.JTextField;
 import org.springframework.util.StringUtils;
 import org.stats.core.beans.AccountBean;
 import org.stats.core.config.Application;
+import org.stats.core.exception.CustomException;
 import org.stats.core.managers.AccountManager;
 import org.stats.core.managers.CurrencyManager;
 import org.stats.core.managers.OrganizationManager;
@@ -190,8 +191,6 @@ public class EditAccountForm extends JFrame {
 		}
 		return isOnHandCheckBox;
 	}
-
-	
 	
 	public IdNameComboBox getAccountCurrencySelectBox() {
 		if(null == accountCurrencySelectBox) {
@@ -209,7 +208,7 @@ public class EditAccountForm extends JFrame {
 		return accountOrganizationSelectBox;
 	}
 
-	public AccountBean getAccountBean() {
+	public AccountBean getAccountBean() throws CustomException {
 		AccountBean accountBean = new AccountBean();
 		String idString = this.accountIdField.getText();
 		if(!StringUtils.isEmpty(idString)) {
@@ -219,17 +218,23 @@ public class EditAccountForm extends JFrame {
 		accountBean.setName(this.accountNameField.getText());
 		accountBean.setDescription(this.accountDescriptionField.getText());
 		Date startDate = null;
+		String startDateStr = this.accountStartDateField.getText();
 		try {
-			startDate = Constants.DATE_FORMAT.parse(this.accountStartDateField.getText());
+			if (!StringUtils.isEmpty(startDateStr)) {
+				startDate = Constants.DATE_FORMAT.parse(startDateStr);
+			}
 		} catch (ParseException e) {
-			e.printStackTrace();
+			throw new CustomException("Unparseable date:" + startDateStr, e);
 		}
 		accountBean.setStartDate(startDate);
 		Date endDate = null;
+		String endDateStr = this.accountEndDateField.getText();
 		try {
-			endDate = Constants.DATE_FORMAT.parse(this.accountEndDateField.getText());
+			if (!StringUtils.isEmpty(endDateStr)) {
+				endDate = Constants.DATE_FORMAT.parse(endDateStr);
+			}
 		} catch (ParseException e) {
-			e.printStackTrace();
+			throw new CustomException("Unparseable date:" + endDateStr, e);
 		}
 		accountBean.setEndDate(endDate);
 		accountBean.setIsOnHand(this.isOnHandCheckBox.isSelected());

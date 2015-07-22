@@ -7,11 +7,10 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
-import org.stats.core.beans.ActionResult;
 import org.stats.core.beans.OrganizationBean;
 import org.stats.core.dao.OrganizationDao;
 import org.stats.core.entity.Organization;
+import org.stats.core.exception.ValidationException;
 
 @Component
 public class OrganizationManager {
@@ -40,26 +39,19 @@ public class OrganizationManager {
 		return null;
 	}
 
-	public ActionResult saveOrganization(OrganizationBean organizationBean) {
-		if (null == organizationBean) {
-			return ActionResult.error("Nothing to save.");
-		}
-		if(StringUtils.isEmpty(organizationBean.getName())) {
-			return ActionResult.error("Organization name should not be empty.");
-		}
+	public Organization saveOrganization(OrganizationBean organizationBean) throws ValidationException {
+		ValidationException.assertNotNull(organizationBean, "Nothing to save");
+		ValidationException.assertNotEmpty(organizationBean.getName(), "Organization name should not be empty");
 		Organization organization = null;
 		if (null != organizationBean.getId()) {
 			organization = dao.get(organizationBean.getId());
-			if (null == organization) {
-				return ActionResult.error("Organization with id #" + organizationBean.getId() + " not found.");
-			}
+			ValidationException.assertNotNull(organization, "Organization with id #" + organizationBean.getId() + " not found");
 		} else {
 			organization = new Organization();
 		}
 		organization.setName(organizationBean.getName());
 		organization.setDescription(organizationBean.getDescription());
-		dao.save(organization);
-		return ActionResult.success();
+		return dao.save(organization);
 	}
 
 	public List<OrganizationBean> getAvailableOrganizations() {
