@@ -8,9 +8,11 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
 
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 @Component
+@Scope(value = "prototype")
 public class ChildWindowCloseListener extends WindowAdapter implements ActionListener {
 	private JFrame parentWindow;
 

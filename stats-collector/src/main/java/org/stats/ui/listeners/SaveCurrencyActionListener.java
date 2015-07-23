@@ -4,9 +4,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.stats.core.config.Application;
 import org.stats.core.exception.ValidationException;
 import org.stats.core.managers.CurrencyManager;
 import org.stats.ui.window.EditCurrencyForm;
@@ -17,6 +17,8 @@ import org.stats.utils.WindowUtils;
 public class SaveCurrencyActionListener implements ActionListener {
 	private static final Logger log = Logger.getLogger(SaveCurrencyActionListener.class);
 	private EditCurrencyForm form;
+	@Autowired
+	private CurrencyManager currencyManager;
 
 	public SaveCurrencyActionListener() {
 	}
@@ -32,9 +34,8 @@ public class SaveCurrencyActionListener implements ActionListener {
 	}
 
 	public void actionPerformed(ActionEvent event) {
-		CurrencyManager currencyManager = Application.getInstance().getBean(CurrencyManager.class);
 		try {
-			currencyManager.saveCurrency(form.getCurrencyBean());
+			getCurrencyManager().saveCurrency(form.getCurrencyBean());
 			form.setVisible(false);
 			form.dispose();
 		} catch (ValidationException e) {
@@ -44,4 +45,13 @@ public class SaveCurrencyActionListener implements ActionListener {
 			log.error("Currency saving error: ", e);
 		}
 	}
+
+	public CurrencyManager getCurrencyManager() {
+		return currencyManager;
+	}
+
+	public void setCurrencyManager(CurrencyManager currencyManager) {
+		this.currencyManager = currencyManager;
+	}
+
 }
