@@ -11,15 +11,18 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.stats.core.beans.CurrencyBean;
-import org.stats.core.config.Application;
 import org.stats.core.managers.CurrencyManager;
-import org.stats.ui.listeners.CancelButtonActionListener;
 import org.stats.ui.listeners.ChildWindowCloseListener;
 import org.stats.ui.listeners.SaveCurrencyActionListener;
 import org.stats.utils.WindowUtils;
 
+@Component
+@Scope(value = "prototype")
 public class EditCurrencyForm extends JFrame {
 	private static final long serialVersionUID = 2535932716410265040L;
 	private JTextField currencyIdField;
@@ -29,17 +32,32 @@ public class EditCurrencyForm extends JFrame {
 	private JButton saveButton;
 	private JButton cancelButton;
 
-	public EditCurrencyForm(Long currencyId) throws HeadlessException {
+	@Autowired
+	private CurrencyManager currencyManager;
+	@Autowired
+	private ChildWindowCloseListener childWindowCloseListener;
+	@Autowired
+	private SaveCurrencyActionListener saveCurrencyActionListener;
+
+	public EditCurrencyForm() throws HeadlessException {
 		super("Edit currency");
+	}
+
+	public EditCurrencyForm(Long currencyId) throws HeadlessException {
+		this();
+		init(currencyId);
+	}
+
+	public EditCurrencyForm init(Long currencyId) {
 		makeInterface();
 		fillFields(currencyId);
 		this.setVisible(true);
+		return this;
 	}
 
 	private void fillFields(Long currencyId) {
 		if (null != currencyId) {
-			CurrencyManager organiaztionManager = Application.getInstance().getBean(CurrencyManager.class);
-			CurrencyBean currencyBean = organiaztionManager.getCurrencyBean(currencyId);
+			CurrencyBean currencyBean = getCurrencyManager().getCurrencyBean(currencyId);
 			if (null != currencyBean) {
 				currencyIdField.setText(currencyBean.getId().toString());
 				currencyNameField.setText(currencyBean.getName());
@@ -74,7 +92,7 @@ public class EditCurrencyForm extends JFrame {
 		buttonsPanel.add(getCancelButton(), BorderLayout.EAST);
 		this.add(buttonsPanel, BorderLayout.SOUTH);
 		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		this.addWindowListener(new ChildWindowCloseListener());
+		this.addWindowListener(getChildWindowCloseListener());
 		WindowUtils.moveToCenter(this);
 		this.pack();
 	}
@@ -112,7 +130,7 @@ public class EditCurrencyForm extends JFrame {
 	public JButton getCancelButton() {
 		if (null == cancelButton) {
 			cancelButton = new JButton("Cancel");
-			cancelButton.addActionListener(new CancelButtonActionListener(this));
+			cancelButton.addActionListener(getChildWindowCloseListener().setParentWindow(this));
 		}
 		return cancelButton;
 	}
@@ -120,21 +138,45 @@ public class EditCurrencyForm extends JFrame {
 	public JButton getSaveButton() {
 		if (null == saveButton) {
 			saveButton = new JButton("Save");
-			saveButton.addActionListener(new SaveCurrencyActionListener(this));
+			saveButton.addActionListener(getSaveCurrencyActionListener().init(this));
 		}
 		return saveButton;
 	}
-	
+
 	public CurrencyBean getCurrencyBean() {
 		CurrencyBean currency = new CurrencyBean();
 		String idString = this.currencyIdField.getText();
-		if(!StringUtils.isEmpty(idString)) {
+		if (!StringUtils.isEmpty(idString)) {
 			currency.setId(Long.valueOf(idString));
 		}
 		currency.setName(this.currencyNameField.getText());
 		currency.setAbbreviation(this.currencyAbbreviationField.getText());
 		currency.setIsDefault(this.isDefaultCurrencyField.isSelected());
 		return currency;
+	}
+
+	public CurrencyManager getCurrencyManager() {
+		return currencyManager;
+	}
+
+	public void setCurrencyManager(CurrencyManager currencyManager) {
+		this.currencyManager = currencyManager;
+	}
+
+	public ChildWindowCloseListener getChildWindowCloseListener() {
+		return childWindowCloseListener;
+	}
+
+	public void setChildWindowCloseListener(ChildWindowCloseListener childWindowCloseListener) {
+		this.childWindowCloseListener = childWindowCloseListener;
+	}
+
+	public SaveCurrencyActionListener getSaveCurrencyActionListener() {
+		return saveCurrencyActionListener;
+	}
+
+	public void setSaveCurrencyActionListener(SaveCurrencyActionListener saveCurrencyActionListener) {
+		this.saveCurrencyActionListener = saveCurrencyActionListener;
 	}
 
 }

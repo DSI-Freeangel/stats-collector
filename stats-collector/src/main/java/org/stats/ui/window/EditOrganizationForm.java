@@ -11,15 +11,18 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.stats.core.beans.OrganizationBean;
-import org.stats.core.config.Application;
 import org.stats.core.managers.OrganizationManager;
-import org.stats.ui.listeners.CancelButtonActionListener;
 import org.stats.ui.listeners.ChildWindowCloseListener;
 import org.stats.ui.listeners.SaveOrganizationActionListener;
 import org.stats.utils.WindowUtils;
 
+@Component
+@Scope(value = "prototype")
 public class EditOrganizationForm extends JFrame {
 	private static final long serialVersionUID = -2719024382425917917L;
 
@@ -28,18 +31,32 @@ public class EditOrganizationForm extends JFrame {
 	private JTextArea organizationDescriptionField;
 	private JButton saveButton;
 	private JButton cancelButton;
+	@Autowired
+	private OrganizationManager organiaztionManager;
+	@Autowired
+	private ChildWindowCloseListener childWindowCloseListener;
+	@Autowired
+	private SaveOrganizationActionListener saveOrganizationActionListener;
+
+	public EditOrganizationForm() throws HeadlessException {
+		super("Edit organization");
+	}
 
 	public EditOrganizationForm(Long organizationId) throws HeadlessException {
-		super("Edit organization");
+		this();
+		init(organizationId);
+	}
+
+	public EditOrganizationForm init(Long organizationId) {
 		makeInterface();
 		fillFields(organizationId);
 		this.setVisible(true);
+		return this;
 	}
 
 	private void fillFields(Long organizationId) {
 		if (null != organizationId) {
-			OrganizationManager organiaztionManager = Application.getInstance().getBean(OrganizationManager.class);
-			OrganizationBean organization = organiaztionManager.getOrganizationBean(organizationId);
+			OrganizationBean organization = getOrganiaztionManager().getOrganizationBean(organizationId);
 			if (null != organization) {
 				organizationIdField.setText(organization.getId().toString());
 				organizationNameField.setText(organization.getName());
@@ -68,7 +85,7 @@ public class EditOrganizationForm extends JFrame {
 		buttonsPanel.add(getCancelButton(), BorderLayout.EAST);
 		this.add(buttonsPanel, BorderLayout.SOUTH);
 		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		this.addWindowListener(new ChildWindowCloseListener());
+		this.addWindowListener(getChildWindowCloseListener());
 		WindowUtils.moveToCenter(this);
 		this.pack();
 	}
@@ -99,7 +116,7 @@ public class EditOrganizationForm extends JFrame {
 	public JButton getCancelButton() {
 		if (null == cancelButton) {
 			cancelButton = new JButton("Cancel");
-			cancelButton.addActionListener(new CancelButtonActionListener(this));
+			cancelButton.addActionListener(getChildWindowCloseListener().setParentWindow(this));
 		}
 		return cancelButton;
 	}
@@ -107,20 +124,44 @@ public class EditOrganizationForm extends JFrame {
 	public JButton getSaveButton() {
 		if (null == saveButton) {
 			saveButton = new JButton("Save");
-			saveButton.addActionListener(new SaveOrganizationActionListener(this));
+			saveButton.addActionListener(getSaveOrganizationActionListener().init(this));
 		}
 		return saveButton;
 	}
-	
+
 	public OrganizationBean getOrganizationBean() {
 		OrganizationBean organization = new OrganizationBean();
 		String idString = this.organizationIdField.getText();
-		if(!StringUtils.isEmpty(idString)) {
+		if (!StringUtils.isEmpty(idString)) {
 			organization.setId(Long.valueOf(idString));
 		}
 		organization.setName(this.organizationNameField.getText());
 		organization.setDescription(this.organizationDescriptionField.getText());
 		return organization;
+	}
+
+	public OrganizationManager getOrganiaztionManager() {
+		return organiaztionManager;
+	}
+
+	public void setOrganiaztionManager(OrganizationManager organiaztionManager) {
+		this.organiaztionManager = organiaztionManager;
+	}
+
+	public ChildWindowCloseListener getChildWindowCloseListener() {
+		return childWindowCloseListener;
+	}
+
+	public void setChildWindowCloseListener(ChildWindowCloseListener childWindowCloseListener) {
+		this.childWindowCloseListener = childWindowCloseListener;
+	}
+
+	public SaveOrganizationActionListener getSaveOrganizationActionListener() {
+		return saveOrganizationActionListener;
+	}
+
+	public void setSaveOrganizationActionListener(SaveOrganizationActionListener saveOrganizationActionListener) {
+		this.saveOrganizationActionListener = saveOrganizationActionListener;
 	}
 
 }

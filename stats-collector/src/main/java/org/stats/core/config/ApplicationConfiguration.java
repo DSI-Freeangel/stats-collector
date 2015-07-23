@@ -16,12 +16,11 @@ import org.springframework.dao.annotation.PersistenceExceptionTranslationPostPro
 import org.springframework.orm.hibernate4.HibernateTransactionManager;
 import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-import org.stats.ui.window.MainWindow;
 
 @Configuration
 @EnableTransactionManagement
 @PropertySource({ "classpath:mysql.properties" })
-@ComponentScan({ "org.stats.core.managers", "org.stats.core.dao" })
+@ComponentScan({ "org.stats.core.managers", "org.stats.core.dao", "org.stats.ui.window", "org.stats.ui.listeners", "org.stats.ui.elements" })
 public class ApplicationConfiguration {
 
 	@Autowired
@@ -69,8 +68,4 @@ public class ApplicationConfiguration {
 		};
 	}
 	
-	@Bean
-	public MainWindow mainWindow() {
-		return new MainWindow();
-	}
 }

@@ -11,6 +11,7 @@ public class AppStarter {
 		SplashWindow splash = new SplashWindow(new Frame());
 		Application.getInstance().init();
 		MainWindow mainWindow = Application.getInstance().getBean(MainWindow.class);
+		mainWindow.init();
 		splash.setVisible(false);
 		mainWindow.setVisible(true);
 	}
