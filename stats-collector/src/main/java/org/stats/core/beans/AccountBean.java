@@ -156,12 +156,5 @@ public class AccountBean {
 	public void setEnabled(Boolean enabled) {
 		this.enabled = enabled;
 	}
-	
-	public String getStartDateString() {
-		return Constants.DATE_FORMAT.format(this.getStartDate());
-	}
-	
-	public String getEndDateString() {
-		return Constants.DATE_FORMAT.format(this.getEndDate());
-	}
+
 }

@@ -3,8 +3,6 @@ package org.stats.ui.window;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.HeadlessException;
-import java.text.ParseException;
-import java.util.Date;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -23,6 +21,7 @@ import org.stats.core.exception.CustomException;
 import org.stats.core.managers.AccountManager;
 import org.stats.core.managers.CurrencyManager;
 import org.stats.core.managers.OrganizationManager;
+import org.stats.ui.elements.CustomDatePicker;
 import org.stats.ui.elements.IdNameComboBox;
 import org.stats.ui.listeners.ChildWindowCloseListener;
 import org.stats.ui.listeners.SaveAccountActionListener;
@@ -38,8 +37,8 @@ public class EditAccountForm extends JFrame {
 	private JTextField accountCustomIdField;
 	private JTextField accountNameField;
 	private JTextArea accountDescriptionField;
-	private JTextField accountStartDateField;
-	private JTextField accountEndDateField;
+	private CustomDatePicker accountStartDateField;
+	private CustomDatePicker accountEndDateField;
 	private JCheckBox isOwnCheckBox;
 	private JCheckBox isOnHandCheckBox;
 	private IdNameComboBox accountCurrencySelectBox;
@@ -82,8 +81,8 @@ public class EditAccountForm extends JFrame {
 				accountNameField.setText(account.getName());
 				accountDescriptionField.setText(account.getDescription());
 				accountCustomIdField.setText(account.getCustomId());
-				accountStartDateField.setText(account.getStartDateString());
-				accountEndDateField.setText(account.getEndDateString());
+				accountStartDateField.setDate(account.getStartDate());
+				accountEndDateField.setDate(account.getEndDate());
 				isOwnCheckBox.setEnabled(account.getIsOwn());
 				isOnHandCheckBox.setEnabled(account.getIsOnHand());
 				accountCurrencySelectBox.setSelectedId(account.getCurrencyId());
@@ -185,16 +184,16 @@ public class EditAccountForm extends JFrame {
 		return accountCustomIdField;
 	}
 
-	public JTextField getAccountStartDateField() {
+	public CustomDatePicker getAccountStartDateField() {
 		if (null == accountStartDateField) {
-			accountStartDateField = new JTextField(30);
+			accountStartDateField = new CustomDatePicker(Constants.DATE_FORMAT);
 		}
 		return accountStartDateField;
 	}
 
-	public JTextField getAccountEndDateField() {
+	public CustomDatePicker getAccountEndDateField() {
 		if (null == accountEndDateField) {
-			accountEndDateField = new JTextField(30);
+			accountEndDateField = new CustomDatePicker(Constants.DATE_FORMAT);
 		}
 		return accountEndDateField;
 	}
@@ -236,26 +235,8 @@ public class EditAccountForm extends JFrame {
 		accountBean.setCustomId(this.accountCustomIdField.getText());
 		accountBean.setName(this.accountNameField.getText());
 		accountBean.setDescription(this.accountDescriptionField.getText());
-		Date startDate = null;
-		String startDateStr = this.accountStartDateField.getText();
-		try {
-			if (!StringUtils.isEmpty(startDateStr)) {
-				startDate = Constants.DATE_FORMAT.parse(startDateStr);
-			}
-		} catch (ParseException e) {
-			throw new CustomException("Unparseable date:" + startDateStr, e);
-		}
-		accountBean.setStartDate(startDate);
-		Date endDate = null;
-		String endDateStr = this.accountEndDateField.getText();
-		try {
-			if (!StringUtils.isEmpty(endDateStr)) {
-				endDate = Constants.DATE_FORMAT.parse(endDateStr);
-			}
-		} catch (ParseException e) {
-			throw new CustomException("Unparseable date:" + endDateStr, e);
-		}
-		accountBean.setEndDate(endDate);
+		accountBean.setStartDate(this.accountStartDateField.getDate());
+		accountBean.setEndDate(this.accountEndDateField.getDate());
 		accountBean.setIsOnHand(this.isOnHandCheckBox.isSelected());
 		accountBean.setIsOwn(this.isOwnCheckBox.isSelected());
 		accountBean.setEnabled(true);
