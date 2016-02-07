@@ -3,7 +3,6 @@ package org.stats.core.beans;
 import java.util.Date;
 
 import org.stats.core.entity.Account;
-import org.stats.utils.Constants;
 
 public class AccountBean {
 	
